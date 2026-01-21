@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roller Coaster Worlds - over.world</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 100%);
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        h1 {
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-align: center;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 5px rgba(255,107,107,0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(72,219,251,0.8)); }
+        }
+        
+        .subtitle {
+            color: #888;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 1600px;
+            width: 100%;
+        }
+        
+        /* Login Panel */
+        #login-panel {
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            max-width: 450px;
+            margin: 50px auto;
+            backdrop-filter: blur(10px);
+        }
+        
+        #login-panel h2 {
+            color: #48dbfb;
+            margin-bottom: 20px;
+        }
+        
+        #login-panel input {
+            background: #0a0a0a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 12px 20px;
+            font-size: 18px;
+            width: 100%;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+            letter-spacing: 4px;
+        }
+        
+        #login-panel input:focus {
+            outline: none;
+            border-color: #48dbfb;
+            box-shadow: 0 0 10px rgba(72, 219, 251, 0.3);
+        }
+        
+        .connect-btn {
+            background: linear-gradient(90deg, #ff6b6b, #feca57);
+            color: #000;
+            border: none;
+            padding: 14px 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .connect-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+        
+        .connect-btn:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #login-status {
+            margin-top: 20px;
+            color: #888;
+            min-height: 24px;
+        }
+        
+        #login-status.error { color: #ff6b6b; }
+        #login-status.success { color: #48dbfb; }
+        
+        /* Main App Panel */
+        #app-panel {
+            display: none;
+        }
+        
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .metrics {
+            display: flex;
+            gap: 25px;
+            font-size: 14px;
+        }
+        
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .metric-label { color: #888; }
+        .metric-value { color: #48dbfb; font-weight: bold; }
+        .metric-value.warning { color: #feca57; }
+        .metric-value.danger { color: #ff6b6b; }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff6b6b;
+            transition: all 0.3s;
+        }
+        
+        .status-dot.connected {
+            background: #48dbfb;
+            box-shadow: 0 0 15px #48dbfb;
+        }
+        
+        #disconnect-btn {
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        #disconnect-btn:hover {
+            background: #ff4757;
+        }
+        
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 20px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .panel {
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .panel h3 {
+            color: #feca57;
+            font-size: 14px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel h3 .icon { font-size: 16px; }
+        
+        /* Image Queue Panel */
+        .queue-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .queue-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        
+        .queue-btn.primary {
+            background: linear-gradient(90deg, #48dbfb, #ff9ff3);
+            color: #000;
+        }
+        
+        .queue-btn.danger {
+            background: #ff6b6b;
+            color: #fff;
+        }
+        
+        .queue-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        .queue-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #image-queue {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        #image-queue::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #image-queue::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+        
+        .queue-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: #0a0a0a;
+            border-radius: 6px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .queue-item.active {
+            border-color: #48dbfb;
+            box-shadow: 0 0 10px rgba(72, 219, 251, 0.3);
+        }
+        
+        .queue-item.next {
+            border-color: #feca57;
+        }
+        
+        .queue-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        
+        .queue-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .queue-item-name {
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .queue-item-status {
+            font-size: 10px;
+            color: #888;
+        }
+        
+        .queue-item-status.active { color: #48dbfb; }
+        .queue-item-status.next { color: #feca57; }
+        
+        .queue-item-remove {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 5px;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        
+        .queue-item-remove:hover {
+            opacity: 1;
+        }
+        
+        .empty-queue {
+            text-align: center;
+            color: #666;
+            padding: 30px;
+            font-size: 12px;
+        }
+        
+        /* Speed Control */
+        .speed-control {
+            margin-bottom: 15px;
+        }
+        
+        .speed-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+        
+        .speed-value {
+            color: #48dbfb;
+            font-weight: bold;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #333;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #48dbfb, #ff9ff3);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(72, 219, 251, 0.5);
+        }
+        
+        /* Ride Controls */
+        .ride-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .ride-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .ride-btn.start {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: #fff;
+            grid-column: span 2;
+        }
+        
+        .ride-btn.stop {
+            background: #ff6b6b;
+            color: #fff;
+            grid-column: span 2;
+        }
+        
+        .ride-btn.prev, .ride-btn.next-btn {
+            background: #333;
+            color: #fff;
+        }
+        
+        .ride-btn:hover {
+            transform: scale(1.02);
+        }
+        
+        .ride-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Ride Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            background: #0a0a0a;
+            border-radius: 6px;
+            padding: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(90deg, #48dbfb, #ff9ff3);
+            color: #000;
+            font-weight: bold;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #48dbfb, #ff9ff3);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 11px;
+            color: #888;
+        }
+        
+        /* Canvas Area */
+        .canvas-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .canvas-wrapper {
+            position: relative;
+            background: #000;
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+            aspect-ratio: 16 / 9;
+        }
+        
+        #world-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .canvas-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .overlay-badge {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .overlay-badge.speed {
+            color: #feca57;
+        }
+        
+        .overlay-badge.world {
+            color: #48dbfb;
+        }
+        
+        #ride-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px 50px;
+            border-radius: 12px;
+            text-align: center;
+            display: none;
+        }
+        
+        #ride-indicator.ready {
+            border: 2px solid #48dbfb;
+        }
+        
+        #ride-indicator .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        /* World Timeline */
+        .world-timeline {
+            display: flex;
+            gap: 5px;
+            padding: 10px;
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+        
+        .timeline-item {
+            flex-shrink: 0;
+            width: 80px;
+            text-align: center;
+        }
+        
+        .timeline-item img {
+            width: 80px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .timeline-item.active img {
+            border-color: #48dbfb;
+            box-shadow: 0 0 10px rgba(72, 219, 251, 0.5);
+        }
+        
+        .timeline-item.next img {
+            border-color: #feca57;
+        }
+        
+        .timeline-item .label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        .timeline-item.active .label {
+            color: #48dbfb;
+        }
+        
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: #48dbfb;
+            background: rgba(72, 219, 251, 0.1);
+        }
+        
+        .drop-zone .icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .drop-zone p {
+            color: #888;
+            font-size: 12px;
+        }
+        
+        #file-input {
+            display: none;
+        }
+        
+        /* Stats Panel */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .stat-item {
+            background: #0a0a0a;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #48dbfb;
+        }
+        
+        .stat-label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        /* Rotation Controls */
+        .rotation-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 15px;
+            background: #0a0a0a;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .rotation-axis {
+            text-align: center;
+        }
+        
+        .rotation-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #48dbfb;
+        }
+        
+        .rotation-label {
+            font-size: 10px;
+            color: #888;
+            margin-top: 4px;
+        }
+        
+        .look-hint {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            padding: 10px;
+            background: rgba(72, 219, 251, 0.1);
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        
+        .look-hint kbd {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #fff;
+        }
+        
+        #pointer-lock-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #48dbfb;
+            display: none;
+        }
+        
+        #pointer-lock-indicator.active {
+            display: block;
+            color: #00b894;
+        }
+        
+        .canvas-wrapper.looking {
+            cursor: none;
+        }
+        
+        .rotation-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .rot-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background: #333;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .rot-btn:hover {
+            background: #48dbfb;
+            color: #000;
+        }
+        
+        .rot-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .rot-btn.center {
+            background: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎢 Roller Coaster Worlds</h1>
+        <p class="subtitle">Pre-generate N world images and ride through infinite realtime worlds</p>
+        
+        <!-- Login Panel -->
+        <div id="login-panel">
+            <h2>🔐 Enter Passphrase</h2>
+            <input type="text" id="passphrase-input" placeholder="PASSPHRASE" autocomplete="off" />
+            <button class="connect-btn" id="connect-btn" onclick="attemptConnect()">🚀 START RIDE</button>
+            <div id="login-status"></div>
+        </div>
+        
+        <!-- Main App Panel -->
+        <div id="app-panel">
+            <div class="app-header">
+                <div class="connection-status">
+                    <div class="status-dot" id="status-dot"></div>
+                    <span id="connection-text">Disconnected</span>
+                </div>
+                <div class="metrics">
+                    <div class="metric">
+                        <span class="metric-label">FPS:</span>
+                        <span class="metric-value" id="fps-value">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Worlds:</span>
+                        <span class="metric-value" id="worlds-count">0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Session:</span>
+                        <span class="metric-value" id="session-time">15:00</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Idle:</span>
+                        <span class="metric-value" id="idle-time">5:00</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">GPU:</span>
+                        <span class="metric-value" id="gpu-id">-</span>
+                    </div>
+                </div>
+                <button id="disconnect-btn" onclick="disconnect()">⏹ END RIDE</button>
+            </div>
+            
+            <div class="main-layout">
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Image Queue Panel -->
+                    <div class="panel">
+                        <h3><span class="icon">🖼️</span> World Waypoints (N Images)</h3>
+                        
+                        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                            <div class="icon">📁</div>
+                            <p>Drop images here or click to upload</p>
+                            <p style="font-size: 10px; margin-top: 5px;">PNG, JPG • Multiple files supported</p>
+                        </div>
+                        <input type="file" id="file-input" accept="image/png,image/jpeg,image/jpg" multiple onchange="handleFileSelect(event)" />
+                        
+                        <div class="queue-controls" style="margin-top: 15px;">
+                            <button class="queue-btn primary" onclick="reverseQueue()">🔃 Reverse</button>
+                            <button class="queue-btn primary" onclick="shuffleQueue()">🔀 Shuffle</button>
+                            <button class="queue-btn danger" onclick="clearQueue()">🗑️ Clear</button>
+                        </div>
+                        
+                        <div id="image-queue">
+                            <div class="empty-queue">
+                                <p>No waypoint images loaded</p>
+                                <p style="margin-top: 5px;">Upload images to start your ride!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ride Control Panel -->
+                    <div class="panel">
+                        <h3><span class="icon">🎮</span> Ride Controls</h3>
+                        
+                        <div class="mode-toggle">
+                            <button class="mode-btn active" data-mode="loop" onclick="setMode('loop')">🔁 Loop</button>
+                            <button class="mode-btn" data-mode="bounce" onclick="setMode('bounce')">↔️ Bounce</button>
+                            <button class="mode-btn" data-mode="random" onclick="setMode('random')">🎲 Random</button>
+                        </div>
+                        
+                        <div class="speed-control">
+                            <div class="speed-label">
+                                <span>Rail Speed</span>
+                                <span class="speed-value" id="speed-display">5.0s</span>
+                            </div>
+                            <input type="range" id="speed-slider" min="1" max="30" value="5" step="0.5" oninput="updateSpeed(this.value)">
+                        </div>
+                        
+                        <div class="ride-controls">
+                            <button class="ride-btn prev" onclick="prevWorld()">⏮ Prev</button>
+                            <button class="ride-btn next-btn" onclick="nextWorld()">Next ⏭</button>
+                            <button class="ride-btn start" id="ride-toggle-btn" onclick="toggleRide()">
+                                ▶️ Start Ride
+                            </button>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="progress-text">
+                                <span id="progress-current">Waiting...</span>
+                                <span id="progress-next">Next: -</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats Panel -->
+                    <div class="panel">
+                        <h3><span class="icon">📊</span> Ride Stats</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-loops">0</div>
+                                <div class="stat-label">Loops</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-frames">0</div>
+                                <div class="stat-label">Frames</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-waypoints">0</div>
+                                <div class="stat-label">Waypoints</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="stat-time">0:00</div>
+                                <div class="stat-label">Ride Time</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Perspective Control Panel -->
+                    <div class="panel">
+                        <h3><span class="icon">🔄</span> Perspective Rotation</h3>
+                        <div class="rotation-display">
+                            <div class="rotation-axis">
+                                <div class="rotation-value" id="rot-x">0°</div>
+                                <div class="rotation-label">Pitch (↑↓)</div>
+                            </div>
+                            <div class="rotation-axis">
+                                <div class="rotation-value" id="rot-y">0°</div>
+                                <div class="rotation-label">Yaw (←→)</div>
+                            </div>
+                        </div>
+                        <div class="rotation-buttons">
+                            <div></div>
+                            <button class="rot-btn" onmousedown="startRotate('up')" onmouseup="stopRotate()" onmouseleave="stopRotate()">⬆️</button>
+                            <div></div>
+                            <button class="rot-btn" onmousedown="startRotate('left')" onmouseup="stopRotate()" onmouseleave="stopRotate()">⬅️</button>
+                            <button class="rot-btn center" onclick="resetRotation()">⟲</button>
+                            <button class="rot-btn" onmousedown="startRotate('right')" onmouseup="stopRotate()" onmouseleave="stopRotate()">➡️</button>
+                            <div></div>
+                            <button class="rot-btn" onmousedown="startRotate('down')" onmouseup="stopRotate()" onmouseleave="stopRotate()">⬇️</button>
+                            <div></div>
+                        </div>
+                        <div class="look-hint">
+                            <kbd>Click canvas</kbd> to look with mouse<br>
+                            <kbd>Arrow keys</kbd> or <kbd>Q</kbd>/<kbd>E</kbd> to rotate<br>
+                            <kbd>R</kbd> to reset view • <kbd>Esc</kbd> to release mouse
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Canvas Area -->
+                <div class="canvas-area">
+                    <div class="canvas-wrapper">
+                        <canvas id="world-canvas" width="960" height="540"></canvas>
+                        <div class="canvas-overlay">
+                            <span class="overlay-badge speed" id="overlay-speed">⏱️ 5.0s</span>
+                            <span class="overlay-badge world" id="overlay-world">🌍 World 0/0</span>
+                        </div>
+                        <div id="ride-indicator" class="ready">
+                            <div class="icon">🎢</div>
+                            <div>Upload images & start ride!</div>
+                        </div>
+                        <div id="pointer-lock-indicator">🎯 Mouse captured - move to look around</div>
+                    </div>
+                    
+                    <!-- World Timeline -->
+                    <div class="world-timeline" id="world-timeline">
+                        <div style="color: #666; padding: 20px; text-align: center; width: 100%;">
+                            World timeline will appear here...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================================================
+        // CONFIGURATION
+        // =============================================================================
+        
+        const MACHINES = [
+            { ip: '50.35.188.29', name: 'Machine 1' },
+            { ip: '50.35.188.64', name: 'Machine 2' },
+            { ip: '50.35.188.72', name: 'Machine 3' },
+        ];
+        
+        const ROUTER_PORT = 8000;
+        const DEFAULT_PROMPT = "Immersive first-person perspective flying through a surreal dreamscape world, cinematic, smooth motion";
+        
+        // =============================================================================
+        // STATE
+        // =============================================================================
+        
+        let ws = null;
+        let sessionId = null;
+        let currentMachine = null;
+        let currentPort = null;
+        let passphrase = '';
+        
+        // Frame stats
+        let frameCount = 0;
+        let totalFrames = 0;
+        let lastFpsUpdate = Date.now();
+        let fps = 0;
+        
+        // Session timing
+        let sessionStartTime = null;
+        let sessionDuration = 900;
+        let lastActivityTime = null;
+        let idleTimeout = 300; // 5 minutes idle timeout
+        
+        // Image queue
+        let imageQueue = [];
+        let currentImageIndex = 0;
+        let worldsGenerated = 0;
+        let loopCount = 0;
+        
+        // Ride state
+        let isRiding = false;
+        let rideMode = 'loop'; // 'loop', 'bounce', 'random'
+        let bounceDirection = 1;
+        let railSpeed = 5; // seconds between world transitions
+        let rideStartTime = null;
+        let lastTransitionTime = null;
+        let rideInterval = null;
+        let progressInterval = null;
+        
+        // Perspective rotation state
+        let isPointerLocked = false;
+        let rotationX = 0; // Pitch (up/down)
+        let rotationY = 0; // Yaw (left/right)
+        let pendingMouseDx = 0;
+        let pendingMouseDy = 0;
+        let rotationSensitivity = 2.5; // Higher = more responsive mouse look
+        let controlInterval = null;
+        
+        const canvas = document.getElementById('world-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // =============================================================================
+        // CONNECTION LOGIC
+        // =============================================================================
+        
+        async function attemptConnect() {
+            passphrase = document.getElementById('passphrase-input').value.trim();
+            if (!passphrase) {
+                setLoginStatus('Please enter a passphrase', 'error');
+                return;
+            }
+            
+            document.getElementById('connect-btn').disabled = true;
+            setLoginStatus('🔄 Connecting...', '');
+            
+            for (const machine of MACHINES) {
+                setLoginStatus(`🔄 Trying ${machine.name}...`, '');
+                
+                try {
+                    const result = await tryClaimGPU(machine);
+                    if (result.success) {
+                        setLoginStatus(`✅ Connected!`, 'success');
+                        currentMachine = machine;
+                        currentPort = result.port;
+                        sessionId = result.session_id;
+                        sessionDuration = result.expires_in || 900;
+                        
+                        connectWebSocket(machine.ip, result.port);
+                        return;
+                    } else if (result.error === 'invalid_key') {
+                        setLoginStatus('❌ Invalid passphrase', 'error');
+                        document.getElementById('connect-btn').disabled = false;
+                        return;
+                    }
+                } catch (e) {
+                    console.log(`${machine.name} unreachable:`, e);
+                }
+            }
+            
+            setLoginStatus('❌ All GPU slots are in use. Try again later.', 'error');
+            document.getElementById('connect-btn').disabled = false;
+        }
+        
+        async function tryClaimGPU(machine) {
+            const url = `http://${machine.ip}:${ROUTER_PORT}/claim?key=${encodeURIComponent(passphrase)}`;
+            const response = await fetch(url, { method: 'GET', mode: 'cors' });
+            return await response.json();
+        }
+        
+        function connectWebSocket(ip, port) {
+            const wsUrl = `ws://${ip}:${port}/ws?session_id=${sessionId}`;
+            console.log('Connecting to:', wsUrl);
+            
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                showAppPanel();
+                sessionStartTime = Date.now();
+                lastActivityTime = Date.now();
+                startTimers();
+                
+                // Send initial prompt
+                sendPrompt(DEFAULT_PROMPT);
+            };
+            
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleMessage(data);
+                } catch (e) {
+                    console.error('Failed to parse message:', e);
+                }
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket closed');
+                setConnectionStatus(false);
+                stopRide();
+                
+                // Only release if we still have session info (disconnect() clears it first)
+                const sid = sessionId;
+                const machine = currentMachine;
+                const wasConnected = sid !== null;
+                
+                // Clear state
+                sessionId = null;
+                currentMachine = null;
+                currentPort = null;
+                
+                if (wasConnected && machine) {
+                    fetch(`http://${machine.ip}:${ROUTER_PORT}/release`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ session_id: sid }),
+                    }).catch(console.error);
+                    
+                    alert('Connection lost. Please reconnect.');
+                    showLoginPanel();
+                }
+            };
+            
+            ws.onerror = (e) => {
+                console.error('WebSocket error:', e);
+            };
+        }
+        
+        function disconnect() {
+            stopRide();
+            
+            // Store session info before clearing
+            const sid = sessionId;
+            const machine = currentMachine;
+            
+            // Clear session state first to prevent onclose from double-releasing
+            sessionId = null;
+            currentMachine = null;
+            currentPort = null;
+            
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+            
+            // Release GPU on router
+            if (sid && machine) {
+                console.log('Releasing GPU session:', sid);
+                fetch(`http://${machine.ip}:${ROUTER_PORT}/release`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sid }),
+                }).then(res => res.json())
+                  .then(data => console.log('GPU released:', data))
+                  .catch(err => console.error('Release error:', err));
+            }
+            
+            showLoginPanel();
+        }
+        
+        // =============================================================================
+        // MESSAGE HANDLING
+        // =============================================================================
+        
+        function handleMessage(data) {
+            switch (data.type) {
+                case 'frame':
+                    displayFrame(data);
+                    break;
+                case 'status':
+                    console.log('Status:', data.message);
+                    break;
+                case 'session_expired':
+                    alert('Session expired. Please reconnect.');
+                    showLoginPanel();
+                    break;
+                case 'error':
+                    console.error('Server error:', data.message);
+                    break;
+            }
+        }
+        
+        function displayFrame(data) {
+            const img = new Image();
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+            img.src = 'data:image/jpeg;base64,' + data.data;
+            
+            // Update stats
+            frameCount++;
+            totalFrames++;
+            document.getElementById('stat-frames').textContent = totalFrames;
+            
+            const now = Date.now();
+            if (now - lastFpsUpdate >= 1000) {
+                fps = frameCount;
+                frameCount = 0;
+                lastFpsUpdate = now;
+                document.getElementById('fps-value').textContent = fps;
+            }
+        }
+        
+        // =============================================================================
+        // IMAGE QUEUE MANAGEMENT
+        // =============================================================================
+        
+        const dropZone = document.getElementById('drop-zone');
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        function handleFileSelect(event) {
+            handleFiles(event.target.files);
+        }
+        
+        function handleFiles(files) {
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+            
+            Array.from(files).forEach(file => {
+                if (!allowedTypes.includes(file.type)) return;
+                if (file.size > 10 * 1024 * 1024) return;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageData = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        dataUrl: e.target.result,
+                        base64: e.target.result.split(',')[1]
+                    };
+                    imageQueue.push(imageData);
+                    updateQueueDisplay();
+                    updateTimeline();
+                    updateStats();
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        function updateQueueDisplay() {
+            const container = document.getElementById('image-queue');
+            
+            if (imageQueue.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-queue">
+                        <p>No waypoint images loaded</p>
+                        <p style="margin-top: 5px;">Upload images to start your ride!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = imageQueue.map((img, index) => {
+                const isActive = index === currentImageIndex;
+                const isNext = index === getNextIndex();
+                let statusClass = '';
+                let statusText = `#${index + 1}`;
+                
+                if (isActive) {
+                    statusClass = 'active';
+                    statusText = '▶️ Current';
+                } else if (isNext) {
+                    statusClass = 'next';
+                    statusText = '⏭ Next';
+                }
+                
+                return `
+                    <div class="queue-item ${isActive ? 'active' : ''} ${isNext ? 'next' : ''}">
+                        <img src="${img.dataUrl}" alt="${img.name}">
+                        <div class="queue-item-info">
+                            <div class="queue-item-name">${img.name}</div>
+                            <div class="queue-item-status ${statusClass}">${statusText}</div>
+                        </div>
+                        <button class="queue-item-remove" onclick="removeFromQueue(${index})">✕</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function removeFromQueue(index) {
+            imageQueue.splice(index, 1);
+            if (currentImageIndex >= imageQueue.length) {
+                currentImageIndex = Math.max(0, imageQueue.length - 1);
+            }
+            updateQueueDisplay();
+            updateTimeline();
+            updateStats();
+        }
+        
+        function shuffleQueue() {
+            for (let i = imageQueue.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [imageQueue[i], imageQueue[j]] = [imageQueue[j], imageQueue[i]];
+            }
+            currentImageIndex = 0;
+            updateQueueDisplay();
+            updateTimeline();
+        }
+        
+        function reverseQueue() {
+            if (imageQueue.length === 0) return;
+            imageQueue.reverse();
+            // Adjust current index to point to the same image
+            currentImageIndex = imageQueue.length - 1 - currentImageIndex;
+            updateQueueDisplay();
+            updateTimeline();
+        }
+        
+        function clearQueue() {
+            if (imageQueue.length === 0) return;
+            if (confirm('Clear all waypoint images?')) {
+                imageQueue = [];
+                currentImageIndex = 0;
+                updateQueueDisplay();
+                updateTimeline();
+                updateStats();
+            }
+        }
+        
+        // =============================================================================
+        // TIMELINE
+        // =============================================================================
+        
+        function updateTimeline() {
+            const container = document.getElementById('world-timeline');
+            
+            if (imageQueue.length === 0) {
+                container.innerHTML = `
+                    <div style="color: #666; padding: 20px; text-align: center; width: 100%;">
+                        World timeline will appear here...
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = imageQueue.map((img, index) => {
+                const isActive = index === currentImageIndex;
+                const isNext = index === getNextIndex();
+                return `
+                    <div class="timeline-item ${isActive ? 'active' : ''} ${isNext ? 'next' : ''}" onclick="jumpToWorld(${index})">
+                        <img src="${img.dataUrl}" alt="${img.name}">
+                        <div class="label">${isActive ? '▶️' : ''} World ${index + 1}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Update overlay
+            document.getElementById('overlay-world').textContent = `🌍 World ${currentImageIndex + 1}/${imageQueue.length}`;
+        }
+        
+        function jumpToWorld(index) {
+            if (index < 0 || index >= imageQueue.length) return;
+            currentImageIndex = index;
+            sendCurrentImage();
+            updateQueueDisplay();
+            updateTimeline();
+            lastTransitionTime = Date.now();
+        }
+        
+        // =============================================================================
+        // RIDE CONTROLS
+        // =============================================================================
+        
+        function setMode(mode) {
+            rideMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === mode);
+            });
+        }
+        
+        function updateSpeed(value) {
+            railSpeed = parseFloat(value);
+            document.getElementById('speed-display').textContent = `${railSpeed.toFixed(1)}s`;
+            document.getElementById('overlay-speed').textContent = `⏱️ ${railSpeed.toFixed(1)}s`;
+        }
+        
+        function toggleRide() {
+            if (isRiding) {
+                stopRide();
+            } else {
+                startRide();
+            }
+        }
+        
+        function startRide() {
+            if (imageQueue.length === 0) {
+                alert('Please upload at least one waypoint image!');
+                return;
+            }
+            
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert('Not connected to server!');
+                return;
+            }
+            
+            isRiding = true;
+            rideStartTime = Date.now();
+            lastTransitionTime = Date.now();
+            
+            // Update UI
+            const btn = document.getElementById('ride-toggle-btn');
+            btn.textContent = '⏸ Stop Ride';
+            btn.classList.remove('start');
+            btn.classList.add('stop');
+            
+            document.getElementById('ride-indicator').style.display = 'none';
+            
+            // Send first image immediately
+            sendCurrentImage();
+            
+            // Start the ride loop
+            rideInterval = setInterval(advanceWorld, railSpeed * 1000);
+            
+            // Start progress updates
+            progressInterval = setInterval(updateProgress, 50);
+            
+            updateActivity();
+        }
+        
+        function stopRide() {
+            isRiding = false;
+            
+            if (rideInterval) {
+                clearInterval(rideInterval);
+                rideInterval = null;
+            }
+            
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+            
+            // Stop control loop
+            stopControlLoop();
+            stopRotate();
+            
+            // Update UI
+            const btn = document.getElementById('ride-toggle-btn');
+            btn.textContent = '▶️ Start Ride';
+            btn.classList.remove('stop');
+            btn.classList.add('start');
+            
+            document.getElementById('progress-fill').style.width = '0%';
+            document.getElementById('progress-current').textContent = 'Paused';
+        }
+        
+        function advanceWorld() {
+            if (!isRiding || imageQueue.length === 0) return;
+            
+            const nextIdx = getNextIndex();
+            
+            // Track loops
+            if (rideMode === 'loop' && nextIdx === 0 && currentImageIndex === imageQueue.length - 1) {
+                loopCount++;
+                document.getElementById('stat-loops').textContent = loopCount;
+            }
+            
+            currentImageIndex = nextIdx;
+            worldsGenerated++;
+            lastTransitionTime = Date.now();
+            
+            sendCurrentImage();
+            updateQueueDisplay();
+            updateTimeline();
+            updateWorldsCount();
+            updateActivity();
+        }
+        
+        function getNextIndex() {
+            if (imageQueue.length === 0) return 0;
+            
+            switch (rideMode) {
+                case 'loop':
+                    return (currentImageIndex + 1) % imageQueue.length;
+                    
+                case 'bounce':
+                    let next = currentImageIndex + bounceDirection;
+                    if (next >= imageQueue.length) {
+                        bounceDirection = -1;
+                        next = currentImageIndex - 1;
+                    } else if (next < 0) {
+                        bounceDirection = 1;
+                        next = currentImageIndex + 1;
+                    }
+                    return Math.max(0, Math.min(imageQueue.length - 1, next));
+                    
+                case 'random':
+                    if (imageQueue.length === 1) return 0;
+                    let randIdx;
+                    do {
+                        randIdx = Math.floor(Math.random() * imageQueue.length);
+                    } while (randIdx === currentImageIndex);
+                    return randIdx;
+                    
+                default:
+                    return (currentImageIndex + 1) % imageQueue.length;
+            }
+        }
+        
+        function prevWorld() {
+            if (imageQueue.length === 0) return;
+            currentImageIndex = (currentImageIndex - 1 + imageQueue.length) % imageQueue.length;
+            sendCurrentImage();
+            updateQueueDisplay();
+            updateTimeline();
+            lastTransitionTime = Date.now();
+        }
+        
+        function nextWorld() {
+            if (imageQueue.length === 0) return;
+            currentImageIndex = (currentImageIndex + 1) % imageQueue.length;
+            sendCurrentImage();
+            updateQueueDisplay();
+            updateTimeline();
+            lastTransitionTime = Date.now();
+        }
+        
+        function updateProgress() {
+            if (!isRiding || !lastTransitionTime) return;
+            
+            const elapsed = Date.now() - lastTransitionTime;
+            const progress = Math.min(100, (elapsed / (railSpeed * 1000)) * 100);
+            
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            
+            const remaining = Math.max(0, railSpeed - (elapsed / 1000));
+            document.getElementById('progress-current').textContent = `Next in ${remaining.toFixed(1)}s`;
+            
+            const nextIdx = getNextIndex();
+            document.getElementById('progress-next').textContent = `Next: World ${nextIdx + 1}`;
+        }
+        
+        // =============================================================================
+        // SERVER COMMUNICATION
+        // =============================================================================
+        
+        function sendCurrentImage() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            if (imageQueue.length === 0) return;
+            
+            const currentImage = imageQueue[currentImageIndex];
+            
+            // Send seed image
+            ws.send(JSON.stringify({
+                type: 'seed_image',
+                data: currentImage.base64
+            }));
+            
+            // Send reset to apply
+            ws.send(JSON.stringify({
+                type: 'reset'
+            }));
+            
+            // Send continuous control with current rotation
+            sendControl();
+            
+            // Start continuous control sending if not already running
+            startControlLoop();
+        }
+        
+        function sendControl(extraDx = 0, extraDy = 0) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            
+            // Combine pending mouse movement with any extra
+            const dx = pendingMouseDx + extraDx;
+            const dy = pendingMouseDy + extraDy;
+            
+            // Reset pending
+            pendingMouseDx = 0;
+            pendingMouseDy = 0;
+            
+            ws.send(JSON.stringify({
+                type: 'control',
+                buttons: ['W'], // Always move forward on the rail
+                mouse_dx: dx,
+                mouse_dy: dy
+            }));
+            
+            updateActivity();
+        }
+        
+        function startControlLoop() {
+            if (controlInterval) return;
+            
+            // Send controls at ~20 Hz to keep world generating smoothly
+            controlInterval = setInterval(() => {
+                if (ws && ws.readyState === WebSocket.OPEN && isRiding) {
+                    sendControl();
+                }
+            }, 50);
+        }
+        
+        function stopControlLoop() {
+            if (controlInterval) {
+                clearInterval(controlInterval);
+                controlInterval = null;
+            }
+        }
+        
+        // =============================================================================
+        // PERSPECTIVE ROTATION
+        // =============================================================================
+        
+        // Pointer lock for mouse look
+        canvas.addEventListener('click', () => {
+            if (!isPointerLocked) {
+                canvas.requestPointerLock();
+            }
+        });
+        
+        document.addEventListener('pointerlockchange', () => {
+            isPointerLocked = document.pointerLockElement === canvas;
+            const indicator = document.getElementById('pointer-lock-indicator');
+            const wrapper = document.querySelector('.canvas-wrapper');
+            
+            if (isPointerLocked) {
+                indicator.classList.add('active');
+                wrapper.classList.add('looking');
+            } else {
+                indicator.classList.remove('active');
+                wrapper.classList.remove('looking');
+            }
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isPointerLocked) return;
+            
+            const dx = e.movementX * rotationSensitivity;
+            const dy = e.movementY * rotationSensitivity;
+            
+            // Accumulate rotation for display
+            rotationY += dx;
+            rotationX += dy;
+            
+            // Clamp pitch to prevent flipping
+            rotationX = Math.max(-90, Math.min(90, rotationX));
+            
+            // Wrap yaw
+            rotationY = ((rotationY % 360) + 360) % 360;
+            if (rotationY > 180) rotationY -= 360;
+            
+            // Accumulate for next control send
+            pendingMouseDx += dx;
+            pendingMouseDy += dy;
+            
+            updateRotationDisplay();
+            updateActivity();
+        });
+        
+        // Keyboard rotation
+        let activeRotation = null;
+        let keyRotationInterval = null;
+        
+        document.addEventListener('keydown', (e) => {
+            if (document.activeElement.tagName === 'TEXTAREA' || 
+                document.activeElement.tagName === 'INPUT') return;
+            
+            const key = e.key.toLowerCase();
+            
+            // Rotation keys
+            if (key === 'arrowleft' || key === 'q') {
+                startRotate('left');
+                e.preventDefault();
+            } else if (key === 'arrowright' || key === 'e') {
+                startRotate('right');
+                e.preventDefault();
+            } else if (key === 'arrowup') {
+                startRotate('up');
+                e.preventDefault();
+            } else if (key === 'arrowdown') {
+                startRotate('down');
+                e.preventDefault();
+            } else if (key === 'r') {
+                resetRotation();
+                e.preventDefault();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            const key = e.key.toLowerCase();
+            if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', 'q', 'e'].includes(key)) {
+                stopRotate();
+            }
+        });
+        
+        function startRotate(direction) {
+            if (activeRotation === direction) return;
+            stopRotate();
+            
+            activeRotation = direction;
+            applyRotation(direction);
+            
+            keyRotationInterval = setInterval(() => {
+                applyRotation(direction);
+            }, 50);
+        }
+        
+        function stopRotate() {
+            activeRotation = null;
+            if (keyRotationInterval) {
+                clearInterval(keyRotationInterval);
+                keyRotationInterval = null;
+            }
+        }
+        
+        function applyRotation(direction) {
+            const rotSpeed = 3;
+            
+            switch (direction) {
+                case 'left':
+                    rotationY -= rotSpeed;
+                    pendingMouseDx -= rotSpeed * 2;
+                    break;
+                case 'right':
+                    rotationY += rotSpeed;
+                    pendingMouseDx += rotSpeed * 2;
+                    break;
+                case 'up':
+                    rotationX -= rotSpeed;
+                    pendingMouseDy -= rotSpeed * 2;
+                    break;
+                case 'down':
+                    rotationX += rotSpeed;
+                    pendingMouseDy += rotSpeed * 2;
+                    break;
+            }
+            
+            // Clamp and wrap
+            rotationX = Math.max(-90, Math.min(90, rotationX));
+            rotationY = ((rotationY % 360) + 360) % 360;
+            if (rotationY > 180) rotationY -= 360;
+            
+            updateRotationDisplay();
+            updateActivity();
+        }
+        
+        function resetRotation() {
+            rotationX = 0;
+            rotationY = 0;
+            pendingMouseDx = 0;
+            pendingMouseDy = 0;
+            updateRotationDisplay();
+        }
+        
+        function updateRotationDisplay() {
+            document.getElementById('rot-x').textContent = `${Math.round(rotationX)}°`;
+            document.getElementById('rot-y').textContent = `${Math.round(rotationY)}°`;
+        }
+        
+        function sendPrompt(prompt) {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            
+            ws.send(JSON.stringify({
+                type: 'prompt',
+                prompt: prompt
+            }));
+        }
+        
+        // =============================================================================
+        // TIMERS & STATS
+        // =============================================================================
+        
+        let timerInterval = null;
+        
+        function startTimers() {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                updateTimerDisplays();
+                updateRideTime();
+                sendHeartbeat();
+            }, 1000);
+        }
+        
+        function updateTimerDisplays() {
+            // Session time remaining
+            const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+            const sessionRemaining = Math.max(0, sessionDuration - elapsed);
+            document.getElementById('session-time').textContent = formatTime(sessionRemaining);
+            
+            // Color code session time
+            const sessionEl = document.getElementById('session-time');
+            if (sessionRemaining < 60) {
+                sessionEl.className = 'metric-value danger';
+            } else if (sessionRemaining < 180) {
+                sessionEl.className = 'metric-value warning';
+            } else {
+                sessionEl.className = 'metric-value';
+            }
+            
+            // Idle time remaining
+            const idleElapsed = Math.floor((Date.now() - lastActivityTime) / 1000);
+            const idleRemaining = Math.max(0, idleTimeout - idleElapsed);
+            document.getElementById('idle-time').textContent = formatTime(idleRemaining);
+            
+            // Client-side idle kick: when timer hits 0, disconnect
+            if (idleRemaining <= 0 && ws && ws.readyState === WebSocket.OPEN) {
+                console.log('Idle timeout - disconnecting and releasing GPU');
+                disconnect();
+                return;
+            }
+            
+            // Color code idle time
+            const idleEl = document.getElementById('idle-time');
+            if (idleRemaining < 30) {
+                idleEl.className = 'metric-value danger';
+            } else if (idleRemaining < 60) {
+                idleEl.className = 'metric-value warning';
+            } else {
+                idleEl.className = 'metric-value';
+            }
+            
+            // Update GPU ID
+            document.getElementById('gpu-id').textContent = currentPort ? (currentPort - 8080) : '-';
+        }
+        
+        function updateRideTime() {
+            if (!rideStartTime || !isRiding) return;
+            const elapsed = Math.floor((Date.now() - rideStartTime) / 1000);
+            document.getElementById('stat-time').textContent = formatTime(elapsed);
+        }
+        
+        function updateWorldsCount() {
+            document.getElementById('worlds-count').textContent = worldsGenerated;
+        }
+        
+        function updateStats() {
+            document.getElementById('stat-waypoints').textContent = imageQueue.length;
+        }
+        
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+        
+        function updateActivity() {
+            lastActivityTime = Date.now();
+        }
+        
+        async function sendHeartbeat() {
+            if (!sessionId || !currentMachine) return;
+            
+            try {
+                const response = await fetch(
+                    `http://${currentMachine.ip}:${ROUTER_PORT}/heartbeat?session_id=${sessionId}`
+                );
+                const data = await response.json();
+                
+                if (!data.success && data.error === 'session_not_found') {
+                    alert('Session expired. Please reconnect.');
+                    showLoginPanel();
+                }
+            } catch (e) {
+                console.error('Heartbeat error:', e);
+            }
+        }
+        
+        // =============================================================================
+        // UI HELPERS
+        // =============================================================================
+        
+        function setLoginStatus(message, type) {
+            const el = document.getElementById('login-status');
+            el.textContent = message;
+            el.className = type;
+        }
+        
+        function setConnectionStatus(connected) {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('connection-text');
+            
+            if (connected) {
+                dot.classList.add('connected');
+                text.textContent = 'Connected';
+            } else {
+                dot.classList.remove('connected');
+                text.textContent = 'Disconnected';
+            }
+        }
+        
+        function showLoginPanel() {
+            document.getElementById('login-panel').style.display = 'block';
+            document.getElementById('app-panel').style.display = 'none';
+            document.getElementById('connect-btn').disabled = false;
+            document.getElementById('passphrase-input').value = '';
+            setLoginStatus('', '');
+            
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            stopRide();
+            sessionId = null;
+            currentMachine = null;
+            currentPort = null;
+        }
+        
+        function showAppPanel() {
+            document.getElementById('login-panel').style.display = 'none';
+            document.getElementById('app-panel').style.display = 'block';
+            setConnectionStatus(true);
+            
+            // Show ride indicator if no images
+            if (imageQueue.length === 0) {
+                document.getElementById('ride-indicator').style.display = 'block';
+            }
+        }
+        
+        // =============================================================================
+        // CLEANUP
+        // =============================================================================
+        
+        window.addEventListener('beforeunload', () => {
+            if (sessionId && currentMachine) {
+                const data = JSON.stringify({ session_id: sessionId });
+                navigator.sendBeacon(
+                    `http://${currentMachine.ip}:${ROUTER_PORT}/release`,
+                    new Blob([data], { type: 'application/json' })
+                );
+            }
+            if (ws) ws.close();
+        });
+        
+        // =============================================================================
+        // INIT
+        // =============================================================================
+        
+        document.getElementById('passphrase-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') attemptConnect();
+        });
+        
+        document.getElementById('passphrase-input').focus();
+    </script>
+</body>
+</html>
