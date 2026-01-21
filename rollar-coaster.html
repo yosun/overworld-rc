@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roller Coaster Worlds - over.world</title>
+    <title>VelocityJack Roller Coaster Worlds - over.world</title>
     <style>
         * {
             margin: 0;
@@ -744,6 +744,164 @@
         .rot-btn.center {
             background: #ff6b6b;
         }
+        
+        /* Veo Integration Panel */
+        .veo-section {
+            margin-bottom: 15px;
+        }
+        
+        .veo-input {
+            width: 100%;
+            background: #0a0a0a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        
+        .veo-input:focus {
+            outline: none;
+            border-color: #48dbfb;
+        }
+        
+        .veo-input::placeholder {
+            color: #666;
+        }
+        
+        .veo-textarea {
+            min-height: 60px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .veo-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .veo-row .veo-input {
+            margin-bottom: 0;
+        }
+        
+        .veo-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .veo-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .veo-btn.generate {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            color: #fff;
+        }
+        
+        .veo-btn.generate:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+        }
+        
+        .veo-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .veo-status {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            padding: 10px;
+            background: #0a0a0a;
+            border-radius: 6px;
+            margin-top: 10px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .veo-status.success { color: #00b894; }
+        .veo-status.error { color: #ff6b6b; }
+        .veo-status.loading { color: #feca57; }
+        
+        .veo-preview {
+            margin-top: 10px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #0a0a0a;
+        }
+        
+        .veo-preview video {
+            width: 100%;
+            display: block;
+        }
+        
+        .veo-frames-select {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .veo-frames-select label {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+        }
+        
+        .veo-frames-select input {
+            flex: 1;
+        }
+        
+        .veo-frames-value {
+            color: #48dbfb;
+            font-weight: bold;
+            min-width: 30px;
+            text-align: right;
+        }
+        
+        .api-key-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .api-key-toggle input[type="checkbox"] {
+            accent-color: #6c5ce7;
+        }
+        
+        .api-key-toggle label {
+            font-size: 11px;
+            color: #888;
+            cursor: pointer;
+        }
+        
+        .veo-collapsed {
+            display: none;
+        }
+        
+        .veo-expanded {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -815,6 +973,62 @@
                             <div class="empty-queue">
                                 <p>No waypoint images loaded</p>
                                 <p style="margin-top: 5px;">Upload images to start your ride!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Veo Video Generation Panel -->
+                    <div class="panel">
+                        <h3><span class="icon">🎬</span> Veo 3.1 Video → Frames</h3>
+                        
+                        <div class="api-key-toggle">
+                            <input type="checkbox" id="veo-enable" onchange="toggleVeoPanel()">
+                            <label for="veo-enable">Enable Replicate Veo Integration</label>
+                        </div>
+                        
+                        <div id="veo-panel" class="veo-collapsed">
+                            <div class="veo-section">
+                                <label class="veo-label">Replicate API Key</label>
+                                <input type="password" class="veo-input" id="replicate-api-key" placeholder="r8_xxxxxxxxxxxxxxxx" />
+                            </div>
+                            
+                            <div class="veo-section">
+                                <label class="veo-label">Video Prompt</label>
+                                <textarea class="veo-input veo-textarea" id="veo-prompt" placeholder="A first-person POV flying through an ethereal crystal cave with bioluminescent formations..."></textarea>
+                            </div>
+                            
+                            <div class="veo-row">
+                                <div style="flex: 1;">
+                                    <label class="veo-label">Duration</label>
+                                    <select class="veo-input" id="veo-duration">
+                                        <option value="5">5 seconds</option>
+                                        <option value="8" selected>8 seconds</option>
+                                    </select>
+                                </div>
+                                <div style="flex: 1;">
+                                    <label class="veo-label">Aspect Ratio</label>
+                                    <select class="veo-input" id="veo-aspect">
+                                        <option value="16:9" selected>16:9</option>
+                                        <option value="9:16">9:16</option>
+                                        <option value="1:1">1:1</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="veo-frames-select">
+                                <label>Extract frames:</label>
+                                <input type="range" id="veo-frame-count" min="4" max="30" value="10" oninput="updateFrameCountDisplay()">
+                                <span class="veo-frames-value" id="veo-frame-count-display">10</span>
+                            </div>
+                            
+                            <button class="veo-btn generate" id="veo-generate-btn" onclick="generateVeoVideo()">
+                                🎬 Generate Video & Extract Frames
+                            </button>
+                            
+                            <div class="veo-status" id="veo-status">Enter API key and prompt to generate</div>
+                            
+                            <div class="veo-preview" id="veo-preview" style="display: none;">
+                                <video id="veo-video" controls></video>
                             </div>
                         </div>
                     </div>
@@ -1912,6 +2126,201 @@
         }
         
         // =============================================================================
+        // VEO VIDEO GENERATION
+        // =============================================================================
+        
+        let veoGenerating = false;
+        let currentVideoUrl = null;
+        
+        function toggleVeoPanel() {
+            const enabled = document.getElementById('veo-enable').checked;
+            const panel = document.getElementById('veo-panel');
+            panel.className = enabled ? 'veo-expanded' : 'veo-collapsed';
+        }
+        
+        function updateFrameCountDisplay() {
+            const count = document.getElementById('veo-frame-count').value;
+            document.getElementById('veo-frame-count-display').textContent = count;
+        }
+        
+        function setVeoStatus(message, type = '') {
+            const status = document.getElementById('veo-status');
+            status.textContent = message;
+            status.className = 'veo-status ' + type;
+        }
+        
+        async function generateVeoVideo() {
+            const apiKey = document.getElementById('replicate-api-key').value.trim();
+            const prompt = document.getElementById('veo-prompt').value.trim();
+            const duration = document.getElementById('veo-duration').value;
+            const aspectRatio = document.getElementById('veo-aspect').value;
+            const frameCount = parseInt(document.getElementById('veo-frame-count').value);
+            
+            if (!apiKey) {
+                setVeoStatus('❌ Please enter your Replicate API key', 'error');
+                return;
+            }
+            
+            if (!prompt) {
+                setVeoStatus('❌ Please enter a video prompt', 'error');
+                return;
+            }
+            
+            if (veoGenerating) return;
+            veoGenerating = true;
+            
+            const btn = document.getElementById('veo-generate-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Generating...';
+            
+            try {
+                setVeoStatus('🚀 Starting Veo 3 generation...', 'loading');
+                
+                // Note: Replicate API doesn't support CORS, so we use a proxy
+                // For production, you should use your own backend proxy
+                const CORS_PROXY = 'https://corsproxy.io/?';
+                const REPLICATE_API = 'https://api.replicate.com/v1';
+                
+                // Create prediction using the models endpoint for official models
+                const createResponse = await fetch(CORS_PROXY + encodeURIComponent(`${REPLICATE_API}/models/google/veo-3/predictions`), {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        input: {
+                            prompt: prompt,
+                            duration: parseInt(duration),
+                            aspect_ratio: aspectRatio
+                        }
+                    })
+                });
+                
+                if (!createResponse.ok) {
+                    const errorText = await createResponse.text();
+                    console.error('Replicate error response:', errorText);
+                    let msg = `HTTP ${createResponse.status}`;
+                    try {
+                        const error = JSON.parse(errorText);
+                        msg = error.detail || error.error || error.title || msg;
+                    } catch(e) {}
+                    throw new Error(msg);
+                }
+                
+                let prediction = await createResponse.json();
+                console.log('Prediction created:', prediction);
+                setVeoStatus(`⏳ Processing... (ID: ${prediction.id?.slice(0, 8) || 'unknown'}...)`, 'loading');
+                
+                // Poll for completion
+                while (prediction.status !== 'succeeded' && prediction.status !== 'failed' && prediction.status !== 'canceled') {
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    
+                    const pollResponse = await fetch(CORS_PROXY + encodeURIComponent(`${REPLICATE_API}/predictions/${prediction.id}`), {
+                        headers: { 'Authorization': `Bearer ${apiKey}` }
+                    });
+                    
+                    if (!pollResponse.ok) {
+                        console.warn('Poll failed, retrying...');
+                        continue;
+                    }
+                    
+                    prediction = await pollResponse.json();
+                    console.log('Poll result:', prediction.status);
+                    
+                    if (prediction.status === 'processing' || prediction.status === 'starting') {
+                        const elapsed = Math.round((Date.now() - new Date(prediction.created_at).getTime()) / 1000);
+                        setVeoStatus(`⏳ ${prediction.status}... ${elapsed}s elapsed`, 'loading');
+                    }
+                }
+                
+                if (prediction.status === 'failed' || prediction.status === 'canceled') {
+                    throw new Error(prediction.error || `Generation ${prediction.status}`);
+                }
+                
+                // Get video URL
+                const videoUrl = prediction.output;
+                if (!videoUrl) {
+                    throw new Error('No video URL in response');
+                }
+                
+                currentVideoUrl = videoUrl;
+                setVeoStatus('🎬 Video ready! Extracting frames...', 'loading');
+                
+                // Show video preview
+                const videoEl = document.getElementById('veo-video');
+                videoEl.src = videoUrl;
+                document.getElementById('veo-preview').style.display = 'block';
+                
+                // Extract frames
+                await extractFramesFromVideo(videoUrl, frameCount);
+                
+                setVeoStatus(`✅ Extracted ${frameCount} frames from video!`, 'success');
+                
+            } catch (error) {
+                console.error('Veo error:', error);
+                setVeoStatus(`❌ ${error.message}`, 'error');
+            } finally {
+                veoGenerating = false;
+                btn.disabled = false;
+                btn.textContent = '🎬 Generate Video & Extract Frames';
+            }
+        }
+        
+        async function extractFramesFromVideo(videoUrl, frameCount) {
+            return new Promise((resolve, reject) => {
+                const video = document.createElement('video');
+                video.crossOrigin = 'anonymous';
+                video.muted = true;
+                
+                video.onloadedmetadata = async () => {
+                    const duration = video.duration;
+                    const interval = duration / (frameCount + 1);
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    
+                    const frames = [];
+                    
+                    for (let i = 1; i <= frameCount; i++) {
+                        const time = interval * i;
+                        
+                        await new Promise((resolveSeek) => {
+                            video.currentTime = time;
+                            video.onseeked = () => {
+                                ctx.drawImage(video, 0, 0);
+                                const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                                frames.push({
+                                    id: Date.now() + Math.random(),
+                                    name: `veo_frame_${String(i).padStart(3, '0')}.jpg`,
+                                    dataUrl: dataUrl,
+                                    base64: dataUrl.split(',')[1]
+                                });
+                                resolveSeek();
+                            };
+                        });
+                        
+                        setVeoStatus(`🎞️ Extracting frame ${i}/${frameCount}...`, 'loading');
+                    }
+                    
+                    // Add frames to queue
+                    imageQueue.push(...frames);
+                    updateQueueDisplay();
+                    updateTimeline();
+                    updateStats();
+                    
+                    resolve();
+                };
+                
+                video.onerror = () => reject(new Error('Failed to load video'));
+                video.src = videoUrl;
+                video.load();
+            });
+        }
+        
+        // =============================================================================
         // CLEANUP
         // =============================================================================
         
@@ -1935,6 +2344,20 @@
         });
         
         document.getElementById('passphrase-input').focus();
+        
+        // Load saved Replicate API key
+        const savedApiKey = localStorage.getItem('replicate_api_key');
+        if (savedApiKey) {
+            document.getElementById('replicate-api-key').value = savedApiKey;
+        }
+        
+        // Save API key when changed
+        document.getElementById('replicate-api-key').addEventListener('blur', () => {
+            const key = document.getElementById('replicate-api-key').value.trim();
+            if (key) {
+                localStorage.setItem('replicate_api_key', key);
+            }
+        });
     </script>
 </body>
 </html>
