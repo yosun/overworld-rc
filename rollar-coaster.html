@@ -1210,24 +1210,33 @@
         function handleFiles(files) {
             const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
             
-            Array.from(files).forEach(file => {
-                if (!allowedTypes.includes(file.type)) return;
-                if (file.size > 10 * 1024 * 1024) return;
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const imageData = {
-                        id: Date.now() + Math.random(),
-                        name: file.name,
-                        dataUrl: e.target.result,
-                        base64: e.target.result.split(',')[1]
+            // Filter and sort files by name (chronological for most camera naming conventions)
+            const validFiles = Array.from(files)
+                .filter(file => allowedTypes.includes(file.type) && file.size <= 10 * 1024 * 1024)
+                .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+            
+            // Load all files and maintain order
+            const loadPromises = validFiles.map(file => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        resolve({
+                            id: Date.now() + Math.random(),
+                            name: file.name,
+                            dataUrl: e.target.result,
+                            base64: e.target.result.split(',')[1]
+                        });
                     };
-                    imageQueue.push(imageData);
-                    updateQueueDisplay();
-                    updateTimeline();
-                    updateStats();
-                };
-                reader.readAsDataURL(file);
+                    reader.readAsDataURL(file);
+                });
+            });
+            
+            // Wait for all to load, then add in sorted order
+            Promise.all(loadPromises).then(images => {
+                imageQueue.push(...images);
+                updateQueueDisplay();
+                updateTimeline();
+                updateStats();
             });
         }
         
@@ -1294,8 +1303,8 @@
         function reverseQueue() {
             if (imageQueue.length === 0) return;
             imageQueue.reverse();
-            // Adjust current index to point to the same image
-            currentImageIndex = imageQueue.length - 1 - currentImageIndex;
+            // Reset to start of reversed sequence
+            currentImageIndex = 0;
             updateQueueDisplay();
             updateTimeline();
         }
